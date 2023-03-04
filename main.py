@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
+import random
 
 root = Tk()
 root.title("Rock Paper Scissors")
@@ -14,6 +15,52 @@ def select_weapon():
         player_img.configure(image=paper_photo)
     elif weapons.get() == 'scissors':
         player_img.configure(image=scissors_photo)
+
+
+def fight():
+    # Start the game by pressing the fight button.
+    choices = ['rock', 'paper', 'scissors']
+    # A random choice for the computer player.
+    computer_choice = random.choice(choices)
+    if weapons.get() == "":
+        game_text.configure(text='Please select your weapon!')
+    else:
+        computer_img_replace(computer_choice)
+        if weapons.get() == computer_choice:
+            game_text.configure(text='Draw! There is no winner!')
+        elif (weapons.get() == 'rock' and computer_choice == 'scissors') or \
+                (weapons.get() == 'paper' and computer_choice == 'rock') or \
+                (weapons.get() == 'scissors' and computer_choice == 'paper'):
+            game_text.configure(text='Congratulations! YOU WIN!')
+            score = 'player'
+            change_score(score)
+        else:
+            game_text.configure(text='You Lose! Maybe next time!')
+            score = 'computer'
+            change_score(score)
+
+
+def computer_img_replace(image):
+    # Changes the image of the computer's weapons.
+    if image == 'rock':
+        computer_img.configure(image=rock_photo)
+    elif image == 'paper':
+        computer_img.configure(image=paper_photo)
+    elif image == 'scissors':
+        computer_img.configure(image=scissors_photo)
+
+player_score = 0
+computer_score = 0
+def change_score(score):
+    # Changes the scoreboard.
+    global player_score, computer_score
+    if score == 'player':
+        player_score += 1
+        player_points.configure(text=player_score)
+    elif score == 'computer':
+        computer_score += 1
+        computer_points.configure(text=computer_score)
+
 
 
 # Images
@@ -54,11 +101,11 @@ computer_img.grid(column=3, row=3)
 # Game text
 game_frame = ttk.Frame(mainframe, borderwidth=2, relief=GROOVE)
 game_frame.grid(column=2, row=3, padx=5, pady=15)
-game_text = ttk.Label(game_frame, text='For start game choose your weapon and click fight')
+game_text = ttk.Label(game_frame, text='For start game choose your weapon and click fight.')
 game_text.grid(column=0, row=0)
 
 # Fight button
-fight_button = ttk.Button(mainframe, text='FIGHT!')
+fight_button = ttk.Button(mainframe, text='FIGHT!', command=fight)
 fight_button.grid(column=2, row=4)
 
 # Resize images for weapon select
