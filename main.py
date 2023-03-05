@@ -27,15 +27,15 @@ def fight():
     else:
         computer_img_replace(computer_choice)
         if weapons.get() == computer_choice:
-            game_text.configure(text='Draw! There is no winner!')
+            game_text.configure(text='DRAW! There is no winner!')
         elif (weapons.get() == 'rock' and computer_choice == 'scissors') or \
                 (weapons.get() == 'paper' and computer_choice == 'rock') or \
                 (weapons.get() == 'scissors' and computer_choice == 'paper'):
-            game_text.configure(text='Congratulations! YOU WIN!')
+            game_text.configure(text='YOU WIN! Congratulations!')
             score = 'player'
             change_score(score)
         else:
-            game_text.configure(text='You Lose! Maybe next time!')
+            game_text.configure(text='YOU LOSE! Maybe next time!')
             score = 'computer'
             change_score(score)
 
@@ -49,8 +49,11 @@ def computer_img_replace(image):
     elif image == 'scissors':
         computer_img.configure(image=scissors_photo)
 
+
 player_score = 0
 computer_score = 0
+
+
 def change_score(score):
     # Changes the scoreboard.
     global player_score, computer_score
@@ -60,7 +63,6 @@ def change_score(score):
     elif score == 'computer':
         computer_score += 1
         computer_points.configure(text=computer_score)
-
 
 
 # Images
@@ -86,9 +88,11 @@ ttk.Label(mainframe, text='GAME').grid(column=2, row=2)
 ttk.Label(mainframe, text='COMPUTER').grid(column=3, row=1)
 
 # Points
-player_points = ttk.Label(mainframe, text='0')
+points_style = ttk.Style()
+points_style .configure("style.TLabel", font=("times new roman", 30))
+player_points = ttk.Label(mainframe, text='0', style='style.TLabel')
 player_points.grid(column=1, row=2)
-computer_points = ttk.Label(mainframe, text='0')
+computer_points = ttk.Label(mainframe, text='0', style='style.TLabel')
 computer_points.grid(column=3, row=2)
 
 # Images below points
@@ -97,16 +101,22 @@ player_img.grid(column=1, row=3)
 computer_img = ttk.Label(mainframe, image=question_photo)
 computer_img.grid(column=3, row=3)
 
-
 # Game text
-game_frame = ttk.Frame(mainframe, borderwidth=2, relief=GROOVE)
+game_frame = ttk.Frame(mainframe, width=400, height=100, borderwidth=2, relief=GROOVE)
 game_frame.grid(column=2, row=3, padx=5, pady=15)
-game_text = ttk.Label(game_frame, text='For start game choose your weapon and click fight.')
-game_text.grid(column=0, row=0)
+game_frame.grid_propagate(0)
+text_style = ttk.Style()
+text_style.configure("text_style.TLabel", font=("times new roman", 18))
+game_text = ttk.Label(game_frame, text='Choose your weapon and click fight.', style='text_style.TLabel',
+                      anchor='center')
+game_text.place(relx=0.5, rely=0.5, anchor="center")
 
 # Fight button
-fight_button = ttk.Button(mainframe, text='FIGHT!', command=fight)
+button_style = ttk.Style()
+button_style.configure("style.TButton", font=("times new roman", 18))
+fight_button = ttk.Button(mainframe, text='FIGHT!', style='style.TButton', command=fight)
 fight_button.grid(column=2, row=4)
+
 
 # Resize images for weapon select
 small_size = (100, 100)
