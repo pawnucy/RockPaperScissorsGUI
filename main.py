@@ -59,8 +59,49 @@ class Img:
         elif image == 'scissors':
             self.computer_img.configure(image=self.scissors_photo)
 
+    def select_weapon(self):
+        # Updates player image when weapon is selected
+        if weapons.get() == 'rock':
+            img.player_img.configure(image=img.rock_photo)
+        elif weapons.get() == 'paper':
+            img.player_img.configure(image=img.paper_photo)
+        elif weapons.get() == 'scissors':
+            img.player_img.configure(image=img.scissors_photo)
+
 
 img = Img()
+
+
+class Game:
+    """ Class responsible for game logic. """
+
+    def __init__(self):
+        self.player_score = 0
+        self.computer_score = 0
+        self.choices = ['rock', 'paper', 'scissors']
+
+    def start(self):
+        """ Start the game by pressing the fight button. """
+        computer_choice = random.choice(self.choices)
+        if weapons.get() == "":
+            game_text.configure(text='Please select your weapon!')
+        else:
+            img.computer_img_replace(computer_choice)
+            if weapons.get() == computer_choice:
+                game_text.configure(text='DRAW! There is no winner!')
+            elif (weapons.get() == 'rock' and computer_choice == 'scissors') or \
+                    (weapons.get() == 'paper' and computer_choice == 'rock') or \
+                    (weapons.get() == 'scissors' and computer_choice == 'paper'):
+                game_text.configure(text='YOU WIN! Congratulations!')
+                self.player_score += 1
+                player_points.configure(text=self.player_score)
+            else:
+                game_text.configure(text='YOU LOSE! Maybe next time!')
+                self.computer_score += 1
+                computer_points.configure(text=self.computer_score)
+
+
+game = Game()
 
 
 def create_mainframe():
@@ -70,50 +111,6 @@ def create_mainframe():
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=1)
     return mainframe
-
-
-def select_weapon():
-    # Updates player image when weapon is selected
-    if weapons.get() == 'rock':
-        img.player_img.configure(image=img.rock_photo)
-    elif weapons.get() == 'paper':
-        img.player_img.configure(image=img.paper_photo)
-    elif weapons.get() == 'scissors':
-        img.player_img.configure(image=img.scissors_photo)
-
-
-def fight():
-    # Start the game by pressing the fight button.
-    choices = ['rock', 'paper', 'scissors']
-    # A random choice for the computer player.
-    computer_choice = random.choice(choices)
-    if weapons.get() == "":
-        game_text.configure(text='Please select your weapon!')
-    else:
-        img.computer_img_replace(computer_choice)
-        if weapons.get() == computer_choice:
-            game_text.configure(text='DRAW! There is no winner!')
-        elif (weapons.get() == 'rock' and computer_choice == 'scissors') or \
-                (weapons.get() == 'paper' and computer_choice == 'rock') or \
-                (weapons.get() == 'scissors' and computer_choice == 'paper'):
-            game_text.configure(text='YOU WIN! Congratulations!')
-            score = 'player'
-            change_score(score)
-        else:
-            game_text.configure(text='YOU LOSE! Maybe next time!')
-            score = 'computer'
-            change_score(score)
-
-
-def change_score(score):
-    # Changes the scoreboard.
-    global player_score, computer_score
-    if score == 'player':
-        player_score += 1
-        player_points.configure(text=player_score)
-    elif score == 'computer':
-        computer_score += 1
-        computer_points.configure(text=computer_score)
 
 
 def create_labels(mainframe):
@@ -151,21 +148,8 @@ def create_button(mainframe):
     # Fight button
     button_style = ttk.Style()
     button_style.configure("style.TButton", font=("times new roman", 18))
-    fight_button = ttk.Button(mainframe, text='FIGHT!', style='style.TButton', command=fight)
+    fight_button = ttk.Button(mainframe, text='FIGHT!', style='style.TButton', command=game.start)
     fight_button.grid(column=2, row=4)
-
-
-def resize_image(rock_image, paper_image, scissors_image):
-    # Resize images for weapon select
-    small_size = (100, 100)
-    rock_small = rock_image.resize(small_size)
-    rock_small_photo = ImageTk.PhotoImage(rock_small)
-    paper_small = paper_image.resize(small_size)
-    paper_small_photo = ImageTk.PhotoImage(paper_small)
-    scissors_small = scissors_image.resize(small_size)
-    scissors_small_photo = ImageTk.PhotoImage(scissors_small)
-
-    return rock_small_photo, paper_small_photo, scissors_small_photo
 
 
 def create_weapon_buttons(mainframe):
@@ -175,13 +159,13 @@ def create_weapon_buttons(mainframe):
     weapon_frame.grid(column=2, row=5, pady=12)
     weapons = StringVar()
     rock = ttk.Radiobutton(weapon_frame, image=img.rock_small_photo, variable=weapons, value='rock',
-                           command=select_weapon)
+                           command=img.select_weapon)
     rock.grid(column=1, row=1)
     paper = ttk.Radiobutton(weapon_frame, image=img.paper_small_photo, variable=weapons, value='paper',
-                            command=select_weapon)
+                            command=img.select_weapon)
     paper.grid(column=2, row=1)
     scissors = ttk.Radiobutton(weapon_frame, image=img.scissors_small_photo, variable=weapons, value='scissors',
-                               command=select_weapon)
+                               command=img.select_weapon)
     scissors.grid(column=3, row=1)
 
 
@@ -192,5 +176,5 @@ create_game_frame(frame)
 img.create_players_img(frame)
 create_button(frame)
 create_weapon_buttons(frame)
-select_weapon()
+img.select_weapon()
 root.mainloop()
