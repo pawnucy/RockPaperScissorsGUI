@@ -9,7 +9,58 @@ root.title("Rock Paper Scissors")
 # Variables
 player_score = 0
 computer_score = 0
-global computer_points, player_points, player_img, computer_img, game_text, weapons
+global computer_points, player_points, game_text, weapons
+
+
+class Img:
+    """ Class responsible for displaying images. """
+    def __init__(self):
+        # Load images.
+        self.question_img = Image.open("images/questionmark.png")
+        self.rock_img = Image.open("images/rock.png")
+        self.paper_img = Image.open("images/paper.png")
+        self.scissors_img = Image.open("images/scissors.png")
+        # Create PhotoImage objects from PIL images.
+        self.question_photo = ImageTk.PhotoImage(self.question_img)
+        self.rock_photo = ImageTk.PhotoImage(self.rock_img)
+        self.paper_photo = ImageTk.PhotoImage(self.paper_img)
+        self.scissors_photo = ImageTk.PhotoImage(self.scissors_img)
+        # Resize of images.
+        self.rock_small_photo, self.paper_small_photo, self.scissors_small_photo = self.resize_image(self.rock_img,
+                                                                                                     self.paper_img,
+                                                                                                     self.scissors_img)
+        self.player_img = None
+        self.computer_img = None
+
+    def resize_image(self, rock_image, paper_image, scissors_image):
+        # Resize images for weapon select.
+        small_size = (100, 100)
+        rock_small = rock_image.resize(small_size)
+        rock_small_photo = ImageTk.PhotoImage(rock_small)
+        paper_small = paper_image.resize(small_size)
+        paper_small_photo = ImageTk.PhotoImage(paper_small)
+        scissors_small = scissors_image.resize(small_size)
+        scissors_small_photo = ImageTk.PhotoImage(scissors_small)
+        return rock_small_photo, paper_small_photo, scissors_small_photo
+
+    def create_players_img(self, mainframe):
+        # Images below points.
+        self.player_img = ttk.Label(mainframe, image=self.question_photo)
+        self.player_img.grid(column=1, row=3)
+        self.computer_img = ttk.Label(mainframe, image=self.question_photo)
+        self.computer_img.grid(column=3, row=3)
+
+    def computer_img_replace(self, image):
+        # Changes the image of the computer's weapons.
+        if image == 'rock':
+            self.computer_img.configure(image=self.rock_photo)
+        elif image == 'paper':
+            self.computer_img.configure(image=self.paper_photo)
+        elif image == 'scissors':
+            self.computer_img.configure(image=self.scissors_photo)
+
+
+img = Img()
 
 
 def create_mainframe():
@@ -21,45 +72,14 @@ def create_mainframe():
     return mainframe
 
 
-def create_images():
-    # Load images.
-    question_img = Image.open("images/questionmark.png")
-    rock_img = Image.open("images/rock.png")
-    paper_img = Image.open("images/paper.png")
-    scissors_img = Image.open("images/scissors.png")
-    # Create PhotoImage objects from PIL Images
-    question_photo = ImageTk.PhotoImage(question_img)
-    rock_photo = ImageTk.PhotoImage(rock_img)
-    paper_photo = ImageTk.PhotoImage(paper_img)
-    scissors_photo = ImageTk.PhotoImage(scissors_img)
-    return question_photo, rock_photo, paper_photo, scissors_photo, rock_img, paper_img, scissors_img
-
-
-question_photo, rock_photo, paper_photo, scissors_photo, rock, paper, scissors = create_images()
-
-def resize_image(rock_image, paper_image, scissors_image):
-    # Resize images for weapon select
-    small_size = (100, 100)
-    rock_small = rock_image.resize(small_size)
-    rock_small_photo = ImageTk.PhotoImage(rock_small)
-    paper_small = paper_image.resize(small_size)
-    paper_small_photo = ImageTk.PhotoImage(paper_small)
-    scissors_small = scissors_image.resize(small_size)
-    scissors_small_photo = ImageTk.PhotoImage(scissors_small)
-    return rock_small_photo, paper_small_photo, scissors_small_photo
-
-
-rock_photo_small, paper_photo_small, scissors_photo_small = resize_image(rock, paper, scissors)
-
-
 def select_weapon():
     # Updates player image when weapon is selected
     if weapons.get() == 'rock':
-        player_img.configure(image=rock_photo)
+        img.player_img.configure(image=img.rock_photo)
     elif weapons.get() == 'paper':
-        player_img.configure(image=paper_photo)
+        img.player_img.configure(image=img.paper_photo)
     elif weapons.get() == 'scissors':
-        player_img.configure(image=scissors_photo)
+        img.player_img.configure(image=img.scissors_photo)
 
 
 def fight():
@@ -70,7 +90,7 @@ def fight():
     if weapons.get() == "":
         game_text.configure(text='Please select your weapon!')
     else:
-        computer_img_replace(computer_choice)
+        img.computer_img_replace(computer_choice)
         if weapons.get() == computer_choice:
             game_text.configure(text='DRAW! There is no winner!')
         elif (weapons.get() == 'rock' and computer_choice == 'scissors') or \
@@ -83,16 +103,6 @@ def fight():
             game_text.configure(text='YOU LOSE! Maybe next time!')
             score = 'computer'
             change_score(score)
-
-
-def computer_img_replace(image):
-    # Changes the image of the computer's weapons.
-    if image == 'rock':
-        computer_img.configure(image=rock_photo)
-    elif image == 'paper':
-        computer_img.configure(image=paper_photo)
-    elif image == 'scissors':
-        computer_img.configure(image=scissors_photo)
 
 
 def change_score(score):
@@ -122,15 +132,6 @@ def create_score(mainframe):
     player_points.grid(column=1, row=2)
     computer_points = ttk.Label(mainframe, text='0', style='style.TLabel')
     computer_points.grid(column=3, row=2)
-
-
-def create_players_img(mainframe):
-    global player_img, computer_img
-    # Images below points.
-    player_img = ttk.Label(mainframe, image=question_photo)
-    player_img.grid(column=1, row=3)
-    computer_img = ttk.Label(mainframe, image=question_photo)
-    computer_img.grid(column=3, row=3)
 
 
 def create_game_frame(mainframe):
@@ -173,13 +174,13 @@ def create_weapon_buttons(mainframe):
     weapon_frame = ttk.Frame(mainframe)
     weapon_frame.grid(column=2, row=5, pady=12)
     weapons = StringVar()
-    rock = ttk.Radiobutton(weapon_frame, image=rock_photo_small, variable=weapons, value='rock',
+    rock = ttk.Radiobutton(weapon_frame, image=img.rock_small_photo, variable=weapons, value='rock',
                            command=select_weapon)
     rock.grid(column=1, row=1)
-    paper = ttk.Radiobutton(weapon_frame, image=paper_photo_small, variable=weapons, value='paper',
+    paper = ttk.Radiobutton(weapon_frame, image=img.paper_small_photo, variable=weapons, value='paper',
                             command=select_weapon)
     paper.grid(column=2, row=1)
-    scissors = ttk.Radiobutton(weapon_frame, image=scissors_photo_small, variable=weapons, value='scissors',
+    scissors = ttk.Radiobutton(weapon_frame, image=img.scissors_small_photo, variable=weapons, value='scissors',
                                command=select_weapon)
     scissors.grid(column=3, row=1)
 
@@ -187,8 +188,8 @@ def create_weapon_buttons(mainframe):
 frame = create_mainframe()
 create_labels(frame)
 create_score(frame)
-create_players_img(frame)
 create_game_frame(frame)
+img.create_players_img(frame)
 create_button(frame)
 create_weapon_buttons(frame)
 select_weapon()
