@@ -136,7 +136,7 @@ class GameInterface:
 
     def start_game(self):
         # Start the game by pressing the fight button.
-        game.start()
+        game.fight()
 
 
 interface = GameInterface(root)
@@ -148,8 +148,15 @@ class Game:
         self.player_score = 0
         self.computer_score = 0
         self.choices = ['rock', 'paper', 'scissors']
+        self.frame = interface.create_mainframe()
+        interface.create_labels()
+        interface.create_score()
+        interface.create_game_frame()
+        img.create_players_img(self.frame)
+        interface.create_fight_button()
+        interface.create_weapons_buttons()
 
-    def start(self):
+    def fight(self):
         # Start the game by pressing the fight button.
         computer_choice = random.choice(self.choices)
         if interface.weapons.get() == "":
@@ -169,13 +176,10 @@ class Game:
                 self.computer_score += 1
                 interface.computer_points.configure(text=self.computer_score)
 
+    def start(self):
+        # Start the main loop of the application
+        root.mainloop()
+
 
 game = Game()
-frame = interface.create_mainframe()
-interface.create_labels()
-interface.create_score()
-interface.create_game_frame()
-img.create_players_img(frame)
-interface.create_fight_button()
-interface.create_weapons_buttons()
-root.mainloop()
+game.start()
