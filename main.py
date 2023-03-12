@@ -79,7 +79,7 @@ class GameInterface:
         self.weapons = StringVar()
 
     def create_mainframe(self):
-        """ Create the main frame of the app. """
+        # Create the main frame of the app.
         self.mainframe = ttk.Frame(self.root)
         self.mainframe.grid(column=0, row=0, pady=12, padx=12, sticky=(N, W, E, S))
         self.root.columnconfigure(0, weight=1)
@@ -87,13 +87,13 @@ class GameInterface:
         return self.mainframe
 
     def create_labels(self):
-        """ Create the labels for the game. """
+        # Create the labels for the game.
         ttk.Label(self.mainframe, text='PLAYER').grid(column=1, row=1)
         ttk.Label(self.mainframe, text='GAME').grid(column=2, row=2)
         ttk.Label(self.mainframe, text='COMPUTER').grid(column=3, row=1)
 
     def create_score(self):
-        """ Create the score labels for the game. """
+        # Create the score labels for the game.
         points_style = ttk.Style()
         points_style.configure("style.TLabel", font=("times new roman", 30))
         self.player_points = ttk.Label(self.mainframe, text='0', style='style.TLabel')
@@ -102,7 +102,7 @@ class GameInterface:
         self.computer_points.grid(column=3, row=2)
 
     def create_game_frame(self):
-        """ Create the game frame for the app. """
+        # Create the game frame for the app.
         game_frame = ttk.Frame(self.mainframe, width=400, height=100, borderwidth=2, relief=GROOVE)
         game_frame.grid(column=2, row=3, padx=5, pady=15)
         game_frame.grid_propagate(0)
@@ -128,14 +128,14 @@ class GameInterface:
         scissors.grid(column=3, row=1)
 
     def create_fight_button(self):
-        """ Create the fight button for the app. """
+        # Create the fight button for the app.
         button_style = ttk.Style()
         button_style.configure("style.TButton", font=("times new roman", 18))
         self.fight_button = ttk.Button(self.mainframe, text='FIGHT!', style='style.TButton', command=self.start_game)
         self.fight_button.grid(column=2, row=4)
 
     def start_game(self):
-        """ Start the game by pressing the fight button. """
+        # Start the game by pressing the fight button.
         game.start()
 
 
@@ -144,14 +144,13 @@ interface = GameInterface(root)
 
 class Game:
     """ Class responsible for game logic. """
-
     def __init__(self):
         self.player_score = 0
         self.computer_score = 0
         self.choices = ['rock', 'paper', 'scissors']
 
     def start(self):
-        """ Start the game by pressing the fight button. """
+        # Start the game by pressing the fight button.
         computer_choice = random.choice(self.choices)
         if interface.weapons.get() == "":
             interface.game_text.configure(text='Please select your weapon!')
