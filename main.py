@@ -6,11 +6,6 @@ import random
 root = Tk()
 root.title("Rock Paper Scissors")
 
-# Variables
-player_score = 0
-computer_score = 0
-global computer_points, player_points, game_text, weapons
-
 
 class Img:
     """ Class responsible for displaying images. """
@@ -59,17 +54,92 @@ class Img:
         elif image == 'scissors':
             self.computer_img.configure(image=self.scissors_photo)
 
-    def select_weapon(self):
+    def select_weapon(self, weapon):
         # Updates player image when weapon is selected
-        if weapons.get() == 'rock':
-            img.player_img.configure(image=img.rock_photo)
-        elif weapons.get() == 'paper':
-            img.player_img.configure(image=img.paper_photo)
-        elif weapons.get() == 'scissors':
-            img.player_img.configure(image=img.scissors_photo)
+        if weapon == 'rock':
+            self.player_img.configure(image=self.rock_photo)
+        elif weapon == 'paper':
+            self.player_img.configure(image=self.paper_photo)
+        elif weapon == 'scissors':
+            self.player_img.configure(image=self.scissors_photo)
 
 
 img = Img()
+
+
+class GameInterface:
+    """ Class responsible for creating the game interface. """
+    def __init__(self, root):
+        self.root = root
+        self.mainframe = None
+        self.game_text = None
+        self.player_points = None
+        self.computer_points = None
+        self.fight_button = None
+        self.weapons = StringVar()
+
+    def create_mainframe(self):
+        """ Create the main frame of the app. """
+        self.mainframe = ttk.Frame(self.root)
+        self.mainframe.grid(column=0, row=0, pady=12, padx=12, sticky=(N, W, E, S))
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
+        return self.mainframe
+
+    def create_labels(self):
+        """ Create the labels for the game. """
+        ttk.Label(self.mainframe, text='PLAYER').grid(column=1, row=1)
+        ttk.Label(self.mainframe, text='GAME').grid(column=2, row=2)
+        ttk.Label(self.mainframe, text='COMPUTER').grid(column=3, row=1)
+
+    def create_score(self):
+        """ Create the score labels for the game. """
+        points_style = ttk.Style()
+        points_style.configure("style.TLabel", font=("times new roman", 30))
+        self.player_points = ttk.Label(self.mainframe, text='0', style='style.TLabel')
+        self.player_points.grid(column=1, row=2)
+        self.computer_points = ttk.Label(self.mainframe, text='0', style='style.TLabel')
+        self.computer_points.grid(column=3, row=2)
+
+    def create_game_frame(self):
+        """ Create the game frame for the app. """
+        game_frame = ttk.Frame(self.mainframe, width=400, height=100, borderwidth=2, relief=GROOVE)
+        game_frame.grid(column=2, row=3, padx=5, pady=15)
+        game_frame.grid_propagate(0)
+        text_style = ttk.Style()
+        text_style.configure("text_style.TLabel", font=("times new roman", 18))
+        self.game_text = ttk.Label(game_frame, text='Choose your weapon and click fight.', style='text_style.TLabel',
+                                   anchor='center')
+        self.game_text.place(relx=0.5, rely=0.5, anchor="center")
+
+    def create_weapons_buttons(self):
+        # Weapon select
+        weapon_frame = ttk.Frame(self.mainframe)
+        weapon_frame.grid(column=2, row=5, pady=12)
+        self.weapons = StringVar()
+        rock = ttk.Radiobutton(weapon_frame, image=img.rock_small_photo, variable=self.weapons, value='rock',
+                               command=lambda: img.select_weapon('rock'))
+        rock.grid(column=1, row=1)
+        paper = ttk.Radiobutton(weapon_frame, image=img.paper_small_photo, variable=self.weapons, value='paper',
+                                command=lambda: img.select_weapon('paper'))
+        paper.grid(column=2, row=1)
+        scissors = ttk.Radiobutton(weapon_frame, image=img.scissors_small_photo, variable=self.weapons, value='scissors',
+                                   command=lambda: img.select_weapon('scissors'))
+        scissors.grid(column=3, row=1)
+
+    def create_fight_button(self):
+        """ Create the fight button for the app. """
+        button_style = ttk.Style()
+        button_style.configure("style.TButton", font=("times new roman", 18))
+        self.fight_button = ttk.Button(self.mainframe, text='FIGHT!', style='style.TButton', command=self.start_game)
+        self.fight_button.grid(column=2, row=4)
+
+    def start_game(self):
+        """ Start the game by pressing the fight button. """
+        game.start()
+
+
+interface = GameInterface(root)
 
 
 class Game:
@@ -83,98 +153,30 @@ class Game:
     def start(self):
         """ Start the game by pressing the fight button. """
         computer_choice = random.choice(self.choices)
-        if weapons.get() == "":
-            game_text.configure(text='Please select your weapon!')
+        if interface.weapons.get() == "":
+            interface.game_text.configure(text='Please select your weapon!')
         else:
             img.computer_img_replace(computer_choice)
-            if weapons.get() == computer_choice:
-                game_text.configure(text='DRAW! There is no winner!')
-            elif (weapons.get() == 'rock' and computer_choice == 'scissors') or \
-                    (weapons.get() == 'paper' and computer_choice == 'rock') or \
-                    (weapons.get() == 'scissors' and computer_choice == 'paper'):
-                game_text.configure(text='YOU WIN! Congratulations!')
+            if interface.weapons.get() == computer_choice:
+                interface.game_text.configure(text='DRAW! There is no winner!')
+            elif (interface.weapons.get() == 'rock' and computer_choice == 'scissors') or \
+                    (interface.weapons.get() == 'paper' and computer_choice == 'rock') or \
+                    (interface.weapons.get() == 'scissors' and computer_choice == 'paper'):
+                interface.game_text.configure(text='YOU WIN! Congratulations!')
                 self.player_score += 1
-                player_points.configure(text=self.player_score)
+                interface.player_points.configure(text=self.player_score)
             else:
-                game_text.configure(text='YOU LOSE! Maybe next time!')
+                interface.game_text.configure(text='YOU LOSE! Maybe next time!')
                 self.computer_score += 1
-                computer_points.configure(text=self.computer_score)
+                interface.computer_points.configure(text=self.computer_score)
 
 
 game = Game()
-
-
-def create_mainframe():
-    # Create app mainframe.
-    mainframe = ttk.Frame(root)
-    mainframe.grid(column=0, row=0, pady=12, padx=12, sticky=(N, W, E, S))
-    root.columnconfigure(0, weight=1)
-    root.rowconfigure(0, weight=1)
-    return mainframe
-
-
-def create_labels(mainframe):
-    # Labels
-    ttk.Label(mainframe, text='PLAYER').grid(column=1, row=1)
-    ttk.Label(mainframe, text='GAME').grid(column=2, row=2)
-    ttk.Label(mainframe, text='COMPUTER').grid(column=3, row=1)
-
-
-def create_score(mainframe):
-    global player_points, computer_points
-    # Points
-    points_style = ttk.Style()
-    points_style .configure("style.TLabel", font=("times new roman", 30))
-    player_points = ttk.Label(mainframe, text='0', style='style.TLabel')
-    player_points.grid(column=1, row=2)
-    computer_points = ttk.Label(mainframe, text='0', style='style.TLabel')
-    computer_points.grid(column=3, row=2)
-
-
-def create_game_frame(mainframe):
-    global game_text
-    # Game text
-    game_frame = ttk.Frame(mainframe, width=400, height=100, borderwidth=2, relief=GROOVE)
-    game_frame.grid(column=2, row=3, padx=5, pady=15)
-    game_frame.grid_propagate(0)
-    text_style = ttk.Style()
-    text_style.configure("text_style.TLabel", font=("times new roman", 18))
-    game_text = ttk.Label(game_frame, text='Choose your weapon and click fight.', style='text_style.TLabel',
-                          anchor='center')
-    game_text.place(relx=0.5, rely=0.5, anchor="center")
-
-
-def create_button(mainframe):
-    # Fight button
-    button_style = ttk.Style()
-    button_style.configure("style.TButton", font=("times new roman", 18))
-    fight_button = ttk.Button(mainframe, text='FIGHT!', style='style.TButton', command=game.start)
-    fight_button.grid(column=2, row=4)
-
-
-def create_weapon_buttons(mainframe):
-    global weapons
-    # Weapon select
-    weapon_frame = ttk.Frame(mainframe)
-    weapon_frame.grid(column=2, row=5, pady=12)
-    weapons = StringVar()
-    rock = ttk.Radiobutton(weapon_frame, image=img.rock_small_photo, variable=weapons, value='rock',
-                           command=img.select_weapon)
-    rock.grid(column=1, row=1)
-    paper = ttk.Radiobutton(weapon_frame, image=img.paper_small_photo, variable=weapons, value='paper',
-                            command=img.select_weapon)
-    paper.grid(column=2, row=1)
-    scissors = ttk.Radiobutton(weapon_frame, image=img.scissors_small_photo, variable=weapons, value='scissors',
-                               command=img.select_weapon)
-    scissors.grid(column=3, row=1)
-
-
-frame = create_mainframe()
-create_labels(frame)
-create_score(frame)
-create_game_frame(frame)
+frame = interface.create_mainframe()
+interface.create_labels()
+interface.create_score()
+interface.create_game_frame()
 img.create_players_img(frame)
-create_button(frame)
-create_weapon_buttons(frame)
-img.select_weapon()
+interface.create_fight_button()
+interface.create_weapons_buttons()
 root.mainloop()
